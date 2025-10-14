@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Document</title>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class='container'>
+    <h1 class='title'>Enter Servo Value</h1>
+      <input id='input' type='number' min='0' max='180' value='0'>
+      <p id='msg'></p>
+    </div>
+  </div>
+  
+</body>
+
+<script defer>
+  const ip = '192.168.4.1';
+  const port = '80';
+  
+  const input = document.getElementById('input');
+  const msg = document.getElementById('msg');
+
+  input.onchange = async () => {
+    if (input.value < 0) input.value = 0;
+    if (input.value > 180) input.value = 180;
+
+    try {
+      const response = await fetch(`http://${ip}:${port}/angle/set/${input.value}`, {
+        method: 'POST'
+      });
+      const txt = await response.text();
+      msg.innerText = txt;
+    } catch (error) {
+      msg.innerHTML = `<span class='err'>${error}</span>`;
+    }
+  }
+</script>
+</html>
