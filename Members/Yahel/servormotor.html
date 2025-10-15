@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML FILE</title>
+</head>
+<body>
+    <h1>Servo motors</h1>
+    <input type="text" id="textInput">
+
+
+    <div class="range-container">
+    <button class="range-button" id="rangebutton">Apply</button>
+    </div>
+
+    <div class="Presets">
+    <button class="preset" data-preset="left">Left (10*)</button>
+    <button class="preset" data-preset="right">Right (80*)</button>
+    <button class="preset" data-preset="center">Center (45*)</button>
+    <button class="preset" data-preset="min">Min (1*)</button>
+    <button class="preset" data-preset="max">Max (90*)</button>
+    </div>
+
+
+
+    <div class="log">
+    <h2>Movement History Log</h2>
+    <div id="logentries"></div>
+    </div>
+    
+    <div class="result" id="result"></div>
+</body>
+
+<script> 
+
+///logs//////////////////////////////////////////////
+//array for logs
+let movementlog=[];
+function addtolog(angle,source){
+    const timestamp=new Date().toLocaleTimeString();
+
+    const logentry={
+        timestamp:timestamp,
+        angle:angle,
+        source:source
+        }
+    //add one or more elements to the beginning of an array
+    movementlog.unshift(logentry);
+    console.log('Movement:',logentry);
+
+    //The innerHTML property sets or returns the HTML content (inner HTML) of an element.
+    document.getElementById('logentries').innerHTML = `Moving servo ${angle}°, TIME: ${timestamp}<br><br>` + document.getElementById('logentries').innerHTML;
+};
+
+
+
+//Entering value and "moving"/////////////////////////////////////////////////////////////////////
+document.getElementById('rangebutton').addEventListener("click",function()
+{
+    const input= document.getElementById('textInput');
+
+    //function used to convert a string into an integer
+    const angle=parseInt(input.value);
+    
+    //function used to determine whether a value is NaN (Not-a-Number)
+    if (isNaN(angle)){
+        document.getElementById('result').textContent="Enter a valid number";
+        return;
+    }
+
+    //Checks if the angle is between 1-90
+    if (angle<1 || angle>90){
+        document.getElementById('result').textContent="Angle must be in the range of 1-90";
+        return;
+    }
+
+    document.getElementById('result').textContent=`Moving servo ${angle}*`;
+    this.textContent=`Applied: ${angle}*`;
+
+
+    addtolog(angle,'manual');
+});
+
+
+
+// Presets/////////////////////////////////////////////////////////////////
+
+//Stores names as keys and their angles(values)
+    const presets={
+        left:10,
+        right:80,
+        center:45,
+        min:1,
+        max:90
+    };
+
+
+    //presets workers
+    //Get all html elements with class 'preset'  (all presets)
+    const presetbutton=document.querySelectorAll('.preset');
+    
+    const result=document.getElementById('result');
+
+    const textInput=document.getElementById('textInput');
+
+    //loops through each preset button
+    presetbutton.forEach(button=>{
+        button.addEventListener('click',function(){
+            const presetname=this.getAttribute('data-preset');
+            //Looks up the angle from the presets using preset name
+            const angle=presets[presetname];
+
+            textInput.value=angle;
+
+            result.textContent=`Moving servo to ${presetname} position:${angle}*`;
+
+            document.getElementById('rangebutton').textContent=`Applied: ${angle}*`;
+
+            addtolog(angle,`preset: ${presetname}`);
+            
+        })
+    });
+</script>
